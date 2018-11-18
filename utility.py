@@ -49,7 +49,7 @@ def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400):
         ind_x_rand = np.random.randint(nrow, size=1)
         x_rand = valX[ind_x_rand]
         grad = gradient_update(w, x_rand, y)
-        w -= alpha * grad
+        w -= alpha * vec_hypercube_proj(grad)
         weights[iteration] = w
 
     if iteration == 0:
@@ -170,6 +170,13 @@ def make_samples_gauss(mu, sigma, n, dim, random_state=None):
         print('sigma should be a matrix, not a scalar')
         res = 0
     return res
+
+def make_random_labels(n):
+
+    labels = np.random.randint(2, size=n)
+    labels[labels == 0] = -1
+
+    return labels
 
 def check_random_state(seed):
     """Turn seed into a np.random.RandomState instance
