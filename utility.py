@@ -1,6 +1,21 @@
 import numpy as np
 import scipy as sp
 from scipy import linalg
+import random
+
+def cost_function(w, X, y):
+
+    z = y * np.matmul(X, w)
+    cost = np.sum(logistic_loss(z))
+
+    return cost
+
+
+def logistic_loss(z):
+
+    s = np.log(1 + np.exp(-z))
+
+    return s
 
 def gradcheck_naive(f, x):
     """
@@ -28,27 +43,23 @@ def gradcheck_naive(f, x):
     while not it.finished:
         ix = it.multi_index
 
-        ### YOUR CODE HERE: try modifying x[ix] with h defined above to compute numerical gradients
-        ### make sure you call random.setstate(rndstate) before calling f(x) each time, this will make it
-        ### possible to test cost functions with built in randomness later
-
-        ## NOTE: useful information about gradient checker
-        ## http://ufldl.stanford.edu/wiki/index.php/Gradient_checking_and_advanced_optimization
-        ## http://davidrosenberg.github.io/ml2015/homework/hw1.pdf
-
-        ### YOUR CODE HERE:
-
-#         print(ix)
-        rndstate = random.getstate()
-        random.setstate(rndstate)
-
         thetaPlus = np.array(x)
         thetaPlus[ix] += h
 
         thetaMinus = np.array(x)
         thetaMinus[ix] -= h
 
+        ### random.setstate(rndstate) before calling f(x) each time, this will make it
+        ### possible to test cost functions with built in randomness later
+
+        rndstate = random.getstate()
+        random.setstate(rndstate)
+
         jthetaP, tmp = f(thetaPlus)
+
+        rndstate = random.getstate()
+        random.setstate(rndstate)
+
         jthetaM, tmp = f(thetaMinus)
         numgrad = (jthetaP - jthetaM) / (2 * h)
 
