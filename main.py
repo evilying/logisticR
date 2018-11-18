@@ -22,7 +22,7 @@ t_X = np.random.randn(t_samples, t_features-1)
 t_y = np.ones(t_samples)
 t_y[: int(t_samples/2)] *= -1
 
-random_w = np.random.randn(t_features)
-w_hat = stochastic_grad_decent(random_w, t_X, t_y)
-
+random_w = np.zeros(t_features)
+T = 400
+w_hat = stochastic_grad_decent(random_w, t_X, t_y, alpha=0.1, max_iterations=T)
 print(w_hat)
