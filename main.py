@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 
 dim = 4
 mu0 = -0.25 * np.ones(dim)
-sigma = 2 * np.eye(dim)
+sigma = (0.3**2) * np.eye(dim)
 n = 1000
 
 mu1 = 0.25 * np.ones(dim)
@@ -19,8 +19,7 @@ num_pos = n - num_neg
 samples_pos = make_samples_gauss(mu0, sigma, num_pos, dim, random_state=2)
 samples_neg = make_samples_gauss(mu1, sigma, num_neg, dim, random_state=1)
 
-# params = ['hypercube', 'ball']
-params = ['hypercube']
+params = ['hypercube', 'ball']
 
 for i in range(len(params)):
 
@@ -37,13 +36,15 @@ for i in range(len(params)):
         train_test_split(samples, labels, test_size=400, random_state=0)
     w_initial = np.zeros(dim+1)
 
-    T = 1000
+    pl.figure(1, (5, 4))
+    pl.scatter(samples_train[:, 0], samples_train[:, 1], c=labels_train)
+    pl.show()
+    T = 5000
     w_hat = stochastic_grad_decent(w_initial, samples_train, labels_train, \
-            alpha=0.01, max_iterations=T)
+            alpha=0.1, max_iterations=T)
     print(w_hat)
-    predicted_labels =  predict(w_hat, samples_train)
+    predicted_labels =  predict(w_hat, samples_test)
     # print(predicted_labels)
     # print(labels_train)
-    t_precision = predicted_labels[np.where(predicted_labels == labels_train)].size / float(labels_train.size) * 100
-
+    t_precision = predicted_labels[np.where(predicted_labels == labels_test)].size / float(labels_test.size) * 100
     print('Accuracy on the training set: %s%%' % round(t_precision,2))

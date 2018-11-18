@@ -17,7 +17,8 @@ def predict(w, X):
     t = np.dot(valX, w)
 
     probabilities = np.exp(t) / (1 + np.exp(t))
-    predicted_labels = (t > 0) * 1
+    # print(t)
+    predicted_labels = (t >= 0) * 1
     predicted_labels[t < 0] = -1
 
     return predicted_labels
