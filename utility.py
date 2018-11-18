@@ -3,8 +3,6 @@ import scipy as sp
 from scipy import linalg
 import random
 
-
-
 def gradient_update(w, X, y):
 
     z = y * np.matmul(X, w)
@@ -19,8 +17,9 @@ def cost_function(w, X, y):
     z = y * np.matmul(X, w)
     cost = np.sum(logistic_loss(z))
 
-    return cost
+    cost /= X.shape[0]
 
+    return cost
 
 def logistic_loss(z):
 
