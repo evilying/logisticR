@@ -1,6 +1,7 @@
 import numpy as np
 from utility import make_samples_gauss, gradcheck_naive, logistic_loss, \
-    cost_function, gradient_update, gradient_decent, stochastic_grad_decent
+    cost_function, gradient_update, gradient_decent, \
+    stochastic_grad_decent, hypercube_proj, ball_proj
 import pylab as pl
 
 dim = 4
@@ -25,4 +26,7 @@ t_y[: int(t_samples/2)] *= -1
 random_w = np.zeros(t_features)
 T = 400
 w_hat = stochastic_grad_decent(random_w, t_X, t_y, alpha=0.1, max_iterations=T)
-print(w_hat)
+
+# t_X = hypercube_proj(t_X)
+point_nn = ball_proj(t_X)
+print(point_nn)

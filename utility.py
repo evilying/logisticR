@@ -1,7 +1,36 @@
 import numpy as np
+import numpy.linalg as la
 import scipy as sp
 from scipy import linalg
 import random
+from cvxopt import matrix, solvers
+solvers.options['show_progress'] = False
+def ball_proj(X):
+
+    X_ball = X / la.norm(X, axis=1).reshape((X.shape[0], 1))
+
+    return X_ball
+
+def hypercube_proj(X):
+
+    X_hat = np.zeros(X.shape)
+    for i in range(len(X)):
+
+        X_hat[i] = np.array(vec_hypercube_proj(X[i])).reshape((1, X.shape[1]))
+    return X_hat
+
+def vec_hypercube_proj(v):
+
+    dim = len(v)
+    I = matrix(np.eye(dim), (dim, dim), 'd')
+    Q = 2 * I
+    v_p = -2 * v
+    p = matrix(v_p, (dim, 1), 'd')
+    G = matrix([[I, -1 * I]])
+    h = matrix(np.ones(2*dim), (2*dim, 1), 'd')
+    sol=solvers.qp(Q, p, G, h)
+
+    return sol['x']
 
 def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400):
 
