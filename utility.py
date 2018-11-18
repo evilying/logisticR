@@ -74,8 +74,12 @@ def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400, proj='hyperc
             w -= alpha * ball_proj(grad)
         weights[iteration] = w
 
+        w_hat = 1 / (iteration+1) * np.sum(weights, axis=0)
+        cost = cost_function(w_hat, valX, y)
+        print("[ Iteration", iteration, "]", "cost =", cost)
+
     if iteration == 0:
-        print('gradent update does not occur!')
+        print('gradient update does not occur!')
     w_hat = 1 / (iteration+1) * np.sum(weights, axis=0)
 
     return w_hat
