@@ -3,6 +3,45 @@ import scipy as sp
 from scipy import linalg
 import random
 
+def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=4):
+
+    scaleX = X / np.max(abs(X), 0)
+    nrow, ncol = X.shape
+    prefix = np.repeat(1, nrow)
+
+    valX = np.append(prefix[:, None], scaleX, axis = 1)
+
+    iteration = 0
+    weights = np.zeros((max_iterations+1, len(w)))
+    weights[0] = w
+    while(iteration < max_iterations):
+
+        iteration += 1
+        ind_x_rand = np.random.randint(nrow, size=1)
+        x_rand = valX[ind_x_rand]
+        grad = gradient_update(w, x_rand, y)
+        w -= alpha * grad
+        weights[iteration] = w
+    w_hat = np.sum(weights, axis=0)
+    return w_hat
+
+def gradient_decent(w, X, y, alpha=1e-2, max_iterations=400):
+
+    scaleX = X / np.max(abs(X), 0)
+    nrow, ncol = X.shape
+    prefix = np.repeat(1, nrow)
+
+    valX = np.append(prefix[:, None], scaleX, axis = 1)
+
+    iteration = 0
+    while(iteration < max_iterations):
+
+        iteration += 1
+        w -= alpha * gradient_update(w, valX, y)
+        cost = cost_function(w, valX, y)
+        print("[ Iteration", iteration, "]", "cost =", cost)
+
+
 def gradient_update(w, X, y):
 
     z = y * np.matmul(X, w)
