@@ -5,6 +5,23 @@ from scipy import linalg
 import random
 from cvxopt import matrix, solvers
 solvers.options['show_progress'] = False
+
+def predict(w, X):
+
+    X = np.array(X)
+    nrow, ncol = X.shape
+    prefix = np.repeat(1, nrow)
+
+    valX = np.append(prefix[:, None], X, axis = 1)
+
+    t = np.dot(valX, w)
+
+    probabilities = np.exp(t) / (1 + np.exp(t))
+    predicted_labels = (t > 0) * 1
+    predicted_labels[t < 0] = -1
+
+    return predicted_labels
+
 def ball_proj(X):
 
     X_ball = X / la.norm(X, axis=1).reshape((X.shape[0], 1))
@@ -32,14 +49,13 @@ def vec_hypercube_proj(v):
 
     return sol['x']
 
-def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400):
+def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400, proj='hypercube'):
 
     scaleX = X / np.max(abs(X), 0)
     nrow, ncol = X.shape
     prefix = np.repeat(1, nrow)
 
     valX = np.append(prefix[:, None], scaleX, axis = 1)
-
     iteration = 0
     weights = np.zeros((max_iterations, len(w)))
     weights[0] = w
@@ -48,8 +64,14 @@ def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400):
         iteration += 1
         ind_x_rand = np.random.randint(nrow, size=1)
         x_rand = valX[ind_x_rand]
-        grad = gradient_update(w, x_rand, y)
-        w -= alpha * vec_hypercube_proj(grad)
+        y_rand = y[ind_x_rand]
+        grad = gradient_update(w, x_rand, y_rand)
+        if proj == 'hypercube':
+            grad_proj = np.array(vec_hypercube_proj(grad)).reshape((1, len(w)))[0]
+            w = w.reshape((1, len(w)))[0]
+            w -= alpha * grad_proj
+        elif proj == 'ball':
+            w -= alpha * ball_proj(grad)
         weights[iteration] = w
 
     if iteration == 0:
@@ -74,11 +96,11 @@ def gradient_decent(w, X, y, alpha=1e-2, max_iterations=400):
         cost = cost_function(w, valX, y)
         print("[ Iteration", iteration, "]", "cost =", cost)
 
-
 def gradient_update(w, X, y):
 
     z = y * np.matmul(X, w)
     s = (-1 + 1 / (1 + np.exp(-z))) * y
+
     grad = np.sum(X * s[:, None], 0)
     grad /= X.shape[0]
 
