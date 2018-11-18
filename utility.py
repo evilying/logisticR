@@ -3,6 +3,17 @@ import scipy as sp
 from scipy import linalg
 import random
 
+
+
+def gradient_update(w, X, y):
+
+    z = y * np.matmul(X, w)
+    s = (-1 + 1 / (1 + np.exp(-z))) * y
+    grad = np.sum(X * s[:, None], 0)
+    grad /= X.shape[0]
+
+    return grad
+
 def cost_function(w, X, y):
 
     z = y * np.matmul(X, w)
@@ -25,7 +36,6 @@ def gradcheck_naive(f, x):
     """
 
     rndstate = random.getstate()
-
     random.setstate(rndstate)
     fx, grad = f(x) # Evaluate function value at original point
 

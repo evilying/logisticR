@@ -1,6 +1,6 @@
 import numpy as np
 from utility import make_samples_gauss, gradcheck_naive, logistic_loss, \
-    cost_function
+    cost_function, gradient_update
 import pylab as pl
 
 dim = 4
@@ -25,8 +25,8 @@ t_X = np.array([[1, 2], [-1, -2]])
 t_y = np.array([-1, 1])
 t_theta1 = np.array([-10, 10])
 t_theta2 = np.array([10, -10])
-t_c1 = cost_function(t_theta1, t_X, t_y)
-t_c2 = cost_function(t_theta2, t_X, t_y)
+t_g1 = gradient_update(t_theta1, t_X, t_y)
+t_g2 = gradient_update(t_theta2, t_X, t_y)
 print ("=== For autograder ===")
-print (t_c1)
-print (t_c2)
+print (t_g1)
+print (t_g2)
