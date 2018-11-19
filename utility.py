@@ -6,6 +6,25 @@ import random
 from cvxopt import matrix, solvers
 solvers.options['show_progress'] = False
 
+def generate_samples(mu0, mu1, sigma0, sigma1, dim, n, seed0, \
+        seed1, proj='hypercube'):
+
+    labels = make_random_labels(n)
+    num_neg = len(labels[labels == -1])
+    num_pos = n - num_neg
+    samples_pos = make_samples_gauss(mu0, sigma0, num_pos, dim, random_state=seed0)
+    samples_neg = make_samples_gauss(mu1, sigma1, num_neg, dim, random_state=seed1)
+
+    samples = np.zeros((n, dim))
+    if proj == 'hypercube':
+        samples[labels == 1] = hypercube_proj(samples_pos)
+        samples[labels == -1] = hypercube_proj(samples_neg)
+    else:
+        samples[labels == 1] = ball_proj(samples_pos)
+        samples[labels == -1] = ball_proj(samples_neg)
+
+    return samples, labels
+
 def predict(w, X):
 
     X = np.array(X)
@@ -13,7 +32,6 @@ def predict(w, X):
     prefix = np.repeat(1, nrow)
 
     valX = np.append(prefix[:, None], X, axis = 1)
-
     t = np.dot(valX, w)
 
     probabilities = np.exp(t) / (1 + np.exp(t))
@@ -25,9 +43,19 @@ def predict(w, X):
 
 def ball_proj(X):
 
-    X_ball = X / la.norm(X, axis=1).reshape((X.shape[0], 1))
+    norms = la.norm(X, axis=1)
+    X_ball = X
+    X_ball[norms>1] /= la.norm(X_ball[norms>1], axis=1).reshape((X_ball[norms>1].shape[0], 1))
 
     return X_ball
+
+def vec_ball_proj(v):
+
+    if (la.norm(v) <= 1):
+        return v
+
+    v_ball = v / la.norm(v)
+    return v_ball
 
 def hypercube_proj(X):
 
@@ -50,13 +78,14 @@ def vec_hypercube_proj(v):
 
     return sol['x']
 
-def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400, proj='hypercube'):
+def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400, \
+        proj='hypercube', debug=False):
 
-    scaleX = X / np.max(abs(X), 0)
+    # scaleX = X / np.max(abs(X), 0)
     nrow, ncol = X.shape
     prefix = np.repeat(1, nrow)
 
-    valX = np.append(prefix[:, None], scaleX, axis = 1)
+    valX = np.append(prefix[:, None], X, axis = 1)
     iteration = 0
     weights = np.zeros((max_iterations, len(w)))
     weights[0] = w
@@ -72,18 +101,18 @@ def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400, proj='hyperc
             w = w.reshape((1, len(w)))[0]
             w -= alpha * grad_proj
         elif proj == 'ball':
-            w -= alpha * ball_proj(grad)
+            w -= alpha * vec_ball_proj(grad)
         weights[iteration] = w
-
-        w_hat = 1 / (iteration+1) * np.sum(weights, axis=0)
-        cost = cost_function(w_hat, valX, y)
-        print("[ Iteration", iteration, "]", "cost =", cost)
+        if debug:
+            w_hat = 1 / (iteration+1) * np.sum(weights, axis=0)
+            cost = cost_function(w_hat, valX, y)
+            print("[ Iteration", iteration, "]", "cost =", cost)
 
     if iteration == 0:
         print('gradient update does not occur!')
     w_hat = 1 / (iteration+1) * np.sum(weights, axis=0)
-
-    return w_hat
+    cost = cost_function(w_hat, valX, y)
+    return w_hat, cost
 
 def gradient_decent(w, X, y, alpha=1e-2, max_iterations=400):
 

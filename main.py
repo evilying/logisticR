@@ -39,9 +39,9 @@ for i in range(len(params)):
     pl.figure(1, (5, 4))
     pl.scatter(samples_train[:, 0], samples_train[:, 1], c=labels_train)
     pl.show()
-    T = 5000
-    w_hat = stochastic_grad_decent(w_initial, samples_train, labels_train, \
-            alpha=0.1, max_iterations=T)
+    T = len(samples_train)
+    w_hat, _ = stochastic_grad_decent(w_initial, samples_train, labels_train, \
+            alpha=0.1, max_iterations=T, proj=param)
     print(w_hat)
     predicted_labels =  predict(w_hat, samples_test)
     # print(predicted_labels)
