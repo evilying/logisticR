@@ -92,6 +92,8 @@ def stochastic_grad_decent(w, X, y, alpha=1e-2, max_iterations=400, \
     while(iteration < max_iterations-1):
 
         iteration += 1
+        rndstate = random.getstate()
+        random.setstate(rndstate)
         ind_x_rand = np.random.randint(nrow, size=1)
         x_rand = valX[ind_x_rand]
         y_rand = y[ind_x_rand]
