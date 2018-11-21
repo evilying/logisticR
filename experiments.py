@@ -3,7 +3,7 @@ from utility import make_samples_gauss, gradcheck_naive, logistic_loss, \
     cost_function, gradient_update, gradient_decent, \
     stochastic_grad_decent, hypercube_proj, ball_proj, \
     make_random_labels, predict, generate_samples
-import pylab as pl
+import matplotlib.pyplot as pl
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -38,8 +38,10 @@ for j in range(len(vals)):
             T = nsamples
             for irun in range(nruns):
 
-                seed0, seed1 = np.random.randint(100, size=1)[0], \
-                                np.random.randint(100, size=1)[0]
+                # seed0, seed1 = np.random.randint(100, size=1)[0], \
+                #                 np.random.randint(100, size=1)[0]
+                seed0 = irun
+                seed1 = irun
                 samples_train, labels_train = generate_samples(mu0, mu1, \
                         sigma, sigma, dim, nsamples, seed0, seed1, proj=proj)
                 w_initial = np.zeros(dim+1)
