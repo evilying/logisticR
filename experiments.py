@@ -54,7 +54,7 @@ for j in range(len(vals)):
                 prefix = np.repeat(1, nrow)
                 testX = np.append(prefix[:, None], samples_test, axis = 1)
                 risks[i][irun] = cost_function(w_hat, testX, labels_test)
-                clf_errors[i][irun] = t_precision / 100
+                clf_errors[i][irun] = 1 - t_precision / 100
 
         excess_risks = np.zeros(len(nsamples_))
         std_excess_risks = np.zeros(len(nsamples_))
